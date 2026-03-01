@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>チャットボット</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>チャットボット</h1>
+    </header>
+    <main>
+      <div id="messages" class="messages"></div>
+      <form id="chat-form" class="input-area">
+        <input
+          type="text"
+          id="user-input"
+          placeholder="メッセージを入力..."
+          autocomplete="off"
+        />
+        <button type="submit" id="send-btn">送信</button>
+      </form>
+    </main>
+  </div>
+  <script src="/static/app.js"></script>
+</body>
+</html>

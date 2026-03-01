@@ -1,0 +1,4 @@
+# agent.py 実行用
+openai>=1.0.0
+python-dotenv>=1.0.0
+GitPython>=3.1.0

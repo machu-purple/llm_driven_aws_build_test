@@ -1,0 +1,54 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Architecture diagram for llm_driven_aws_build_test'
+
+Resources:
+  # --- 1. ローカル/CI・CD 側の表現 ---
+  # agent.py (LLMエージェント)
+  AgentScript:
+    Type: AWS::Lambda::Function
+    Properties:
+      Description: "agent.py (LLM Agent)"
+      Role: !GetAtt ProvisioningRole.Arn # IAMロールへ線を引く
+
+  # Terraform 実行環境
+  TerraformCLI:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Description: "Terraform CLI"
+      ServiceRole: !GetAtt ProvisioningRole.Arn
+    DependsOn: AgentScript # agent.py から線を引く
+
+  # アプリケーションのソースコード
+  AppCode:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: "application-code"
+
+  # --- 2. デプロイ先の AWS 構成 ---
+  # Terraform 実行用ロール
+  ProvisioningRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Description: "Terraform Execution Role"
+
+  # ターゲット VPC
+  TargetVPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/16
+
+  # パブリックサブネット (VpcId でVPCの中に自動配置されます)
+  PublicSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref TargetVPC
+      CidrBlock: 10.0.1.0/24
+
+  # Chatbot アプリケーション (ECS サービス)
+  ChatbotApp:
+    Type: AWS::ECS::Service
+    Properties:
+      ServiceName: "ChatbotApp"
+    DependsOn:
+      - PublicSubnet # サブネットへ線を引く
+      - AppCode      # コードから線を引く

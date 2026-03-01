@@ -1,0 +1,45 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Architecture diagram for llm_driven_aws_build_test'
+
+Resources:
+  AgentScript:
+    Type: AWS::Lambda::Function
+    Properties:
+      Description: "agent.py (LLM Agent)"
+      Role: !GetAtt ProvisioningRole.Arn
+
+  TerraformCLI:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Description: "Terraform CLI"
+      ServiceRole: !GetAtt ProvisioningRole.Arn
+    DependsOn: AgentScript
+
+  AppCode:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: "application-code"
+
+  ProvisioningRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Description: "Terraform Execution Role"
+
+  TargetVPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/16
+
+  PublicSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref TargetVPC
+      CidrBlock: 10.0.1.0/24
+
+  ChatbotApp:
+    Type: AWS::ECS::Service
+    Properties:
+      ServiceName: "ChatbotApp"
+    DependsOn:
+      - PublicSubnet
+      - AppCode

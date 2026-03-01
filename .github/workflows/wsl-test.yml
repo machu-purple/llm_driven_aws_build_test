@@ -4,6 +4,7 @@ on:
     paths:
       - 'terraform/main.tf'
       - 'app/**'
+  workflow_dispatch:  # 手動実行で「Run workflow」からテスト可能
 
 jobs:
   hello-wsl:
