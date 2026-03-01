@@ -1,5 +1,9 @@
 name: WSL Runner Test
-on: [push]
+on:
+  push:
+    paths:
+      - 'terraform/main.tf'
+      - 'app/**'
 
 jobs:
   hello-wsl:
